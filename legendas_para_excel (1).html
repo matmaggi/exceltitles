@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Template + Legenda → Excel</title>
+<style>
+  :root{
+    --bg:#f6f5f9; --card:#ffffff; --text:#1f1d2b; --muted:#6b6880; --line:#dcd8e8;
+    --accent:#6a4fc4; --accent-text:#ffffff; --head:#d9d2e9; --warn:#fff4d6; --ok:#e6f4ea;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#17151f; --card:#221f2e; --text:#ece9f6; --muted:#9a96b0; --line:#3a3650;
+      --accent:#9b84ec; --accent-text:#14121c; --head:#3b3358; --warn:#4a3d16; --ok:#1f3a2a;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:24px}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px}
+  p.sub{margin:0 0 20px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:700px){.grid{grid-template-columns:1fr}}
+  .drop{background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.15s}
+  .drop:hover,.drop.over{border-color:var(--accent)}
+  .drop.loaded{border-style:solid;border-color:var(--accent)}
+  .drop h2{margin:0 0 4px;font-size:16px}
+  .drop .hint{color:var(--muted);font-size:13px}
+  .drop .fname{margin-top:10px;font-weight:600;word-break:break-all}
+  .drop .info{color:var(--muted);font-size:13px}
+  .drop input{display:none}
+  .opts{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:16px;display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+  .opts label{display:flex;align-items:center;gap:8px;font-size:14px}
+  select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
+  input[type=number]{width:70px}
+  input[type=text]{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
+  button{background:var(--accent);color:var(--accent-text);border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .actions{margin-top:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  #status{color:var(--muted);font-size:14px}
+  #error{color:#c0392b;margin-top:12px;font-weight:600}
+  .tablewrap{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:520px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:center;vertical-align:middle;white-space:pre-wrap}
+  th{position:sticky;top:0;background:var(--head)}
+  td.tc{font-variant-numeric:tabular-nums;white-space:nowrap;width:110px}
+  tr.miss td.b{background:var(--warn)}
+  tr.miss td.c{background:var(--warn)}
+  tr.cont td{background:var(--ok)}
+  .legend{font-size:12px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Template + Legenda → Excel</h1>
+  <p class="sub">Carregue a legenda template (inglês) e a legenda final (português). Formatos aceitos: SRT, DFXP, PXTT, TTML, TTAL. Tudo roda no seu navegador, nada é enviado para lugar nenhum.</p>
+
+  <div class="grid">
+    <label class="drop" id="dropA">
+      <h2>1. Template (inglês)</h2>
+      <div class="hint">Clique ou arraste o arquivo aqui</div>
+      <input type="file" id="fileA" accept=".srt,.dfxp,.pxtt,.ttml,.ttal,.xml,.txt">
+      <div class="fname" id="nameA"></div>
+      <div class="info" id="infoA"></div>
+    </label>
+    <label class="drop" id="dropB">
+      <h2>2. Legenda final (português)</h2>
+      <div class="hint">Clique ou arraste o arquivo aqui</div>
+      <input type="file" id="fileB" accept=".srt,.dfxp,.pxtt,.ttml,.ttal,.xml,.txt">
+      <div class="fname" id="nameB"></div>
+      <div class="info" id="infoB"></div>
+    </label>
+  </div>
+
+  <div class="opts">
+    <label>Frame rate do timecode
+      <select id="fps">
+        <option value="23.976" selected>23.976</option>
+        <option value="24">24</option>
+        <option value="25">25</option>
+        <option value="29.97">29.97</option>
+        <option value="30">30</option>
+        <option value="50">50</option>
+        <option value="59.94">59.94</option>
+        <option value="60">60</option>
+      </select>
+    </label>
+    <label>Tolerância de pareamento
+      <input type="number" id="tol" value="1" min="0" max="10" step="0.1"> s
+    </label>
+    <label>Deslocar tradução
+      <input type="text" id="off" value="00:00:00:00" style="width:105px" title="Use quando os timecodes iniciais forem diferentes (ex.: 01:00:00:00 em um e 00:00:00:00 no outro). Aceita sinal negativo, ex.: -01:00:00:00">
+    </label>
+    <label><input type="checkbox" id="header" checked> Incluir cabeçalho (Tempo Inicial / Template / Tradução)</label>
+  </div>
+
+  <div class="actions">
+    <button id="btn" disabled>Baixar Excel</button>
+    <span id="status">Carregue os dois arquivos para começar.</span>
+  </div>
+  <div id="error"></div>
+
+  <div class="tablewrap" id="tablewrap" hidden>
+    <table>
+      <thead><tr><th>Tempo Inicial</th><th>Template</th><th>Tradução</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="legend" id="legend" hidden>Linhas amarelas: só existe texto de um dos lados. Linhas verdes: continuação (um lado tem mais divisões que o outro, então o outro fica em branco para manter o alinhamento).</div>
+</div>
+
+<script>
+/* ============================================================
+   PARSERS
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+function decodeBuffer(buf){
+  let bytes = new Uint8Array(buf);
+  // UTF-16 BOM
+  if (bytes[0] === 0xFF && bytes[1] === 0xFE) return new TextDecoder('utf-16le').decode(bytes.subarray(2));
+  if (bytes[0] === 0xFE && bytes[1] === 0xFF) return new TextDecoder('utf-16be').decode(bytes.subarray(2));
+  let txt = new TextDecoder('utf-8').decode(bytes);
+  if (txt.includes('\uFFFD')) {
+    // não é UTF-8 válido: tenta Windows-1252
+    try { txt = new TextDecoder('windows-1252').decode(bytes); } catch(e){}
+  }
+  return txt.replace(/^\uFEFF/, '');
+}
+
+function cleanInline(s){
+  return s
+    .replace(/\{\\[^}]*\}/g, '')                         // {\an2}
+    .replace(/<\/?(i|b|u)\s*>/gi, m => m.toLowerCase())  // <I> -> <i>
+    .replace(/<(?!\/?[ibu]>)[^>]*>/g, '')                // remove outras tags
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ');
+}
+
+/* ---------- SRT ---------- */
+function parseSRT(text){
+  const cues = [];
+  const blocks = text.replace(/\r\n?/g, '\n').split(/\n{2,}/);
+  const tre = /(\d+):(\d\d):(\d\d)[,.](\d{1,3})\s*-->\s*(\d+):(\d\d):(\d\d)[,.](\d{1,3})/;
+  for (const blk of blocks){
+    const lines = blk.split('\n');
+    const i = lines.findIndex(l => tre.test(l));
+    if (i < 0) continue;
+    const m = lines[i].match(tre);
+    const ms = (h,mi,s,f) => (+h)*3600 + (+mi)*60 + (+s) + (+(f.padEnd(3,'0')))/1000;
+    const start = ms(m[1],m[2],m[3],m[4]);
+    const end   = ms(m[5],m[6],m[7],m[8]);
+    const body = lines.slice(i+1).map(l => cleanInline(l).trim()).filter(l => l.length);
+    if (!body.length) continue;
+    cues.push({start, end, lines: body, tc: null});
+  }
+  return {cues, fps: null, kind: 'SRT'};
+}
+
+/* ---------- TTML / DFXP / PXTT / TTAL (família XML) ---------- */
+function attr(el, local){
+  for (const a of el.attributes) if (a.localName === local || a.name === local) return a.value;
+  return null;
+}
+
+function parseXMLSubs(text){
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('XML inválido ou corrompido.');
+  const root = doc.documentElement;
+
+  const frameRate = parseFloat(attr(root,'frameRate')) || 30;
+  const mult = (attr(root,'frameRateMultiplier') || '1 1').trim().split(/\s+/).map(Number);
+  const multiplier = (mult[0] && mult[1]) ? mult[0]/mult[1] : 1;
+  const effFps = frameRate * multiplier;
+  const dropNTSC = (attr(root,'dropMode') || '') === 'dropNTSC' && frameRate === 30;
+  const tickRate = parseFloat(attr(root,'tickRate')) || (frameRate*multiplier) || 1;
+  const timeBase = attr(root,'timeBase') || 'media';
+
+  // estilos itálicos
+  const italicStyles = new Set();
+  for (const st of doc.getElementsByTagName('*')){
+    if (st.localName === 'style' && (attr(st,'fontStyle') === 'italic' || attr(st,'fontStyle') === 'oblique')){
+      const id = st.getAttribute('xml:id') || attr(st,'id');
+      if (id) italicStyles.add(id);
+    }
+  }
+  const isItalic = el => {
+    const fs = attr(el,'fontStyle');
+    if (fs) return fs === 'italic' || fs === 'oblique';
+    const sref = attr(el,'style');
+    return !!(sref && sref.split(/\s+/).some(s => italicStyles.has(s)));
+  };
+
+  function parseTime(str){
+    if (!str) return null;
+    str = str.trim();
+    let m;
+    if ((m = str.match(/^(\d+):(\d\d):(\d\d)[:;](\d+)$/))){
+      const h=+m[1], mi=+m[2], s=+m[3], f=+m[4];
+      let total;
+      if (dropNTSC){
+        const tm = h*60 + mi;
+        total = (h*3600 + mi*60 + s)*30 + f - 2*(tm - Math.floor(tm/10));
+      } else {
+        total = (h*3600 + mi*60 + s)*Math.round(frameRate) + f;
+      }
+      const sec = total / effFps;
+      const tc = [m[1].padStart(2,'0'), m[2], m[3], m[4].padStart(2,'0')].join(':');
+      return {sec, tc};
+    }
+    if ((m = str.match(/^(\d+):(\d\d):(\d\d(?:[.,]\d+)?)$/))){
+      return {sec: (+m[1])*3600 + (+m[2])*60 + parseFloat(m[3].replace(',','.')), tc: null};
+    }
+    if ((m = str.match(/^(\d+(?:\.\d+)?)(h|ms|m|s|f|t)$/))){
+      const v = parseFloat(m[1]);
+      const sec = {h:v*3600, m:v*60, s:v, ms:v/1000, f:v/effFps, t:v/tickRate}[m[2]];
+      return {sec, tc: null};
+    }
+    return null;
+  }
+
+  function tokens(node, italic, out){
+    for (const ch of node.childNodes){
+      if (ch.nodeType === 3){
+        const t = ch.nodeValue.replace(/\s+/g,' ');
+        if (t) out.push({t:'text', s:t, it:italic});
+      } else if (ch.nodeType === 1){
+        if (ch.localName === 'br') out.push({t:'br'});
+        else if (ch.localName === 'metadata') continue;   // PXTT: metadados dentro do <p>
+        else tokens(ch, italic || isItalic(ch), out);
+      }
+    }
+  }
+
+  const cues = [];
+  for (const p of doc.getElementsByTagName('*')){
+    if (p.localName !== 'p') continue;
+    const b = parseTime(attr(p,'begin'));
+    if (!b) continue;
+    let e = parseTime(attr(p,'end'));
+    const dur = parseTime(attr(p,'dur'));
+    let endSec = e ? e.sec : (dur ? b.sec + dur.sec : b.sec + 2);
+    const toks = [];
+    tokens(p, isItalic(p), toks);
+    // quebra em linhas
+    const lines = [[]];
+    for (const tk of toks){ if (tk.t === 'br') lines.push([]); else lines[lines.length-1].push(tk); }
+    const outLines = [];
+    for (const ln of lines){
+      let s = '', open = false;
+      for (const tk of ln){
+        if (tk.it && !open){ s += '<i>'; open = true; }
+        if (!tk.it && open){ s += '</i>'; open = false; }
+        s += tk.s;
+      }
+      if (open) s += '</i>';
+      s = s.replace(/<\/i>(\s*)<i>/g, '$1').replace(/\s+/g,' ').replace(/(\s+)<\/i>/g, '</i>$1').replace(/<i>(\s+)/g, '$1<i>').trim();
+      if (s.replace(/<\/?i>/g,'').trim()) outLines.push(s);
+    }
+    if (!outLines.length) continue;
+    cues.push({start:b.sec, end:endSec, lines:outLines, tc:b.tc});
+  }
+  const native = timeBase === 'smpte' ? effFps : null;
+  return {cues, fps: native, kind: 'XML (' + timeBase + ')'};
+}
+
+/* ---------- TTAL (JSON) ---------- */
+function parseTTAL(text){
+  const d = JSON.parse(text);
+  const meta = d.meta || {};
+  // fps: "FPS_2397" -> 23.976, "FPS_24" -> 24, "FPS_2997" -> 29.97 ...
+  let fps = 23.976;
+  const mf = String(meta.fps || '').match(/(\d+)/);
+  if (mf){
+    const n = mf[1];
+    const map = {'2397':23.976,'2398':23.976,'2997':29.97,'5994':59.94};
+    fps = map[n] || parseFloat(n);
+  }
+  const nominal = Math.round(fps);
+  const unitIsFrames = (meta.timeFormat || 'FRAMES') === 'FRAMES';
+  const pad = n => String(n).padStart(2,'0');
+  const frameTC = fr => {
+    const s = Math.floor(fr / nominal), f = fr % nominal;
+    return `${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}:${pad(f)}`;
+  };
+  const cues = [];
+  for (const ev of Object.values(d.events || {})){
+    if (ev == null || typeof ev.txt !== 'string' || typeof ev.start !== 'number') continue;
+    const txt = ev.txt.replace(/\r\n?/g, '\n');
+    const it = new Array(txt.length).fill(false);
+    for (const st of (ev.styles || [])){
+      if (st.type === 'italic') for (let k = Math.max(0, st.from); k < Math.min(txt.length, st.to); k++) it[k] = true;
+    }
+    const lines = [];
+    let pos = 0;
+    for (const raw of txt.split('\n')){
+      let out = '', open = false;
+      for (let k = 0; k < raw.length; k++){
+        const f = it[pos + k];
+        if (f && !open){ out += '<i>'; open = true; }
+        if (!f && open){ out += '</i>'; open = false; }
+        out += raw[k];
+      }
+      if (open) out += '</i>';
+      pos += raw.length + 1;
+      out = out.trim();
+      if (out.replace(/<\/?i>/g,'').trim()) lines.push(out);
+    }
+    if (!lines.length) continue;
+    const endV = typeof ev.end === 'number' ? ev.end : ev.start + 2*fps;
+    if (unitIsFrames) cues.push({start: ev.start / fps, end: endV / fps, lines, tc: frameTC(ev.start)});
+    else cues.push({start: ev.start / 1000, end: endV / 1000, lines, tc: null});
+  }
+  return {cues, fps: unitIsFrames ? fps : null, kind: 'TTAL'};
+}
+
+function parseSubtitle(buf){
+  const text = decodeBuffer(buf);
+  const t = text.trimStart();
+  const res = t.startsWith('{') ? parseTTAL(text) : (t.startsWith('<') || /<tt[\s>]/.test(t.slice(0,2000))) ? parseXMLSubs(text) : parseSRT(text);
+  res.cues.sort((a,b) => a.start - b.start);
+  if (!res.cues.length) throw new Error('Nenhuma legenda encontrada no arquivo.');
+  return res;
+}
+
+/* ============================================================
+   TIMECODE
+   ============================================================ */
+function secToTC(sec, fps){
+  const nominal = Math.round(fps);
+  const total = Math.max(0, Math.round(sec * fps));
+  const f = total % nominal;
+  const s = Math.floor(total / nominal);
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}:${pad(f)}`;
+}
+
+/* ============================================================
+   ALINHAMENTO
+   ============================================================ */
+function align(A, B, tol){
+  // A = template, B = legenda final
+  const n = A.length, m = B.length;
+  const parent = Array.from({length:n+m}, (_,i) => i);
+  const find = x => { while (parent[x] !== x){ parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+  const union = (x,y) => { x = find(x); y = find(y); if (x !== y) parent[x] = y; };
+  const linkedA = new Array(n).fill(false), linkedB = new Array(m).fill(false);
+
+  // Passo 1: pareamento por sobreposição de tempo
+  let j0 = 0;
+  for (let i = 0; i < n; i++){
+    const a = A[i];
+    while (j0 < m && B[j0].end <= a.start - 0.0001 && B[j0].start < a.start) j0++;
+    for (let j = Math.max(0, j0 - 3); j < m; j++){
+      const b = B[j];
+      if (b.start >= a.end) break;
+      const ov = Math.min(a.end, b.end) - Math.max(a.start, b.start);
+      if (ov <= 0) continue;
+      const minDur = Math.max(0.001, Math.min(a.end - a.start, b.end - b.start));
+      if (ov >= Math.max(0.05, 0.3 * minDur)){
+        union(i, n + j); linkedA[i] = linkedB[j] = true;
+      }
+    }
+  }
+
+  // Passo 2: cues soltos, pareia pelo início mais próximo dentro da tolerância
+  const freeA = [], freeB = [];
+  for (let i = 0; i < n; i++) if (!linkedA[i]) freeA.push(i);
+  for (let j = 0; j < m; j++) if (!linkedB[j]) freeB.push(j);
+  const usedB = new Set();
+  for (const i of freeA){
+    let best = -1, bd = Infinity;
+    for (const j of freeB){
+      if (usedB.has(j)) continue;
+      const d = Math.abs(B[j].start - A[i].start);
+      if (d < bd){ bd = d; best = j; }
+    }
+    if (best >= 0 && bd <= tol){ usedB.add(best); union(i, n + best); linkedA[i] = linkedB[best] = true; }
+  }
+
+  // Agrupa componentes
+  const groups = new Map();
+  const add = (key, side, idx) => {
+    if (!groups.has(key)) groups.set(key, {A:[], B:[]});
+    groups.get(key)[side].push(idx);
+  };
+  for (let i = 0; i < n; i++) add(find(i), 'A', i);
+  for (let j = 0; j < m; j++) add(find(n + j), 'B', j);
+
+  const list = [...groups.values()].map(g => {
+    g.A.sort((x,y)=>x-y); g.B.sort((x,y)=>x-y);
+    const starts = [];
+    if (g.A.length) starts.push(A[g.A[0]].start);
+    if (g.B.length) starts.push(B[g.B[0]].start);
+    g.t = Math.min(...starts);
+    return g;
+  }).sort((x,y) => x.t - y.t);
+
+  const rows = [];
+  for (const g of list){
+    const k = Math.max(g.A.length, g.B.length);
+    for (let r = 0; r < k; r++){
+      rows.push({
+        a: r < g.A.length ? A[g.A[r]] : null,
+        b: r < g.B.length ? B[g.B[r]] : null,
+        cont: r > 0
+      });
+    }
+  }
+  return rows;
+}
+
+/* ============================================================
+   ESCRITOR XLSX (sem dependências: ZIP "store" + XML na mão)
+   ============================================================ */
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(data){
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) c = CRC_TABLE[(c ^ data[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function makeZip(files){
+  const enc = new TextEncoder();
+  const chunks = [], central = [];
+  let offset = 0;
+  const u16 = v => [v & 255, (v >>> 8) & 255];
+  const u32 = v => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  for (const f of files){
+    const name = enc.encode(f.name), data = enc.encode(f.data), crc = crc32(data);
+    const lh = new Uint8Array([
+      ...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(33),
+      ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(name.length), ...u16(0)
+    ]);
+    chunks.push(lh, name, data);
+    central.push({name, crc, size: data.length, offset});
+    offset += lh.length + name.length + data.length;
+  }
+  const cdStart = offset;
+  for (const c of central){
+    const h = new Uint8Array([
+      ...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(33),
+      ...u32(c.crc), ...u32(c.size), ...u32(c.size), ...u16(c.name.length), ...u16(0), ...u16(0),
+      ...u16(0), ...u16(0), ...u32(0), ...u32(c.offset)
+    ]);
+    chunks.push(h, c.name);
+    offset += h.length + c.name.length;
+  }
+  const cdSize = offset - cdStart;
+  chunks.push(new Uint8Array([
+    ...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(central.length), ...u16(central.length),
+    ...u32(cdSize), ...u32(cdStart), ...u16(0)
+  ]));
+  return new Blob(chunks, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
+const xmlEsc = s => String(s)
+  .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'')
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function buildXLSX(rows, withHeader){
+  const out = [];
+  if (withHeader) out.push([['Tempo Inicial',2],['Template',2],['Tradução',2]]);
+  for (const r of rows) out.push([[r[0],1],[r[1],1],[r[2],1]]);
+
+  const cols = 'ABC';
+  let sheetRows = '';
+  out.forEach((row, ri) => {
+    let cells = '';
+    row.forEach(([val, style], ci) => {
+      const ref = cols[ci] + (ri + 1);
+      if (val === '' || val == null) cells += `<c r="${ref}" s="${style}"/>`;
+      else cells += `<c r="${ref}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(val)}</t></is></c>`;
+    });
+    sheetRows += `<row r="${ri+1}">${cells}</row>`;
+  });
+
+  const pane = withHeader ? '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>' : '';
+  const sheet = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0">${pane}</sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="1" width="16" customWidth="1"/><col min="2" max="3" width="48" customWidth="1"/></cols><sheetData>${sheetRows}</sheetData></worksheet>`;
+
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD9D2E9"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="49" fontId="1" fillId="2" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+
+  return makeZip([
+    {name:'[Content_Types].xml', data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`},
+    {name:'_rels/.rels', data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+    {name:'xl/workbook.xml', data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Legendas" sheetId="1" r:id="rId1"/></sheets></workbook>`},
+    {name:'xl/_rels/workbook.xml.rels', data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+    {name:'xl/styles.xml', data:styles},
+    {name:'xl/worksheets/sheet1.xml', data:sheet}
+  ]);
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+const state = {A:null, B:null, nameA:'', rows:[]};
+
+function describe(res){
+  return `${res.cues.length} legendas · ${res.kind}` + (res.fps ? ` · ${(Math.round(res.fps*1000)/1000)} fps` : '');
+}
+
+async function loadFile(side, file){
+  $('error').textContent = '';
+  try {
+    const res = parseSubtitle(await file.arrayBuffer());
+    state[side] = res;
+    if (side === 'A') {
+      state.nameA = file.name;
+      if (res.fps){
+        // template já em timecode (SMPTE): seleciona o fps correspondente
+        const sel = $('fps');
+        const target = Math.round(res.fps*1000)/1000;
+        for (const o of sel.options) if (Math.abs(parseFloat(o.value) - target) < 0.01) sel.value = o.value;
+      }
+    }
+    $('name'+side).textContent = file.name;
+    $('info'+side).textContent = describe(res);
+    $('drop'+side).classList.add('loaded');
+  } catch (e){
+    state[side] = null;
+    $('name'+side).textContent = file.name;
+    $('info'+side).textContent = '';
+    $('drop'+side).classList.remove('loaded');
+    $('error').textContent = 'Erro ao ler "' + file.name + '": ' + e.message;
+  }
+  refresh();
+}
+
+function refresh(){
+  const ready = state.A && state.B;
+  $('btn').disabled = !ready;
+  if (!ready){ $('status').textContent = 'Carregue os dois arquivos para começar.'; $('tablewrap').hidden = true; $('legend').hidden = true; return; }
+
+  const fps = parseFloat($('fps').value);
+  const tol = parseFloat($('tol').value) || 0;
+  const om = $('off').value.trim().match(/^(-?)(\d+):(\d\d):(\d\d)[:;](\d+)$/);
+  const nominal = Math.round(fps);
+  const offSec = om ? (om[1] ? -1 : 1) * (((+om[2])*3600 + (+om[3])*60 + (+om[4])) + (+om[5])/fps) : 0;
+  const Bcues = offSec ? state.B.cues.map(c => ({...c, start: c.start + offSec, end: c.end + offSec})) : state.B.cues;
+  const pairs = align(state.A.cues, Bcues, tol);
+
+  state.rows = []; state.meta = [];
+  for (const p of pairs){
+    const tc = p.a ? (p.a.tc || secToTC(p.a.start, fps)) : '';
+    state.rows.push([tc, p.a ? p.a.lines.join('\n') : '', p.b ? p.b.lines.join('\n') : '']);
+    state.meta.push({miss: !p.a || !p.b, cont: p.cont});
+  }
+
+  const tb = $('tbody');
+  tb.innerHTML = '';
+  state.rows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    if (state.meta[i].cont) tr.className = 'cont';
+    else if (state.meta[i].miss) tr.className = 'miss';
+    r.forEach((v, ci) => {
+      const td = document.createElement('td');
+      td.textContent = v;
+      td.className = ['tc','b','c'][ci];
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  $('tablewrap').hidden = false; $('legend').hidden = false;
+  const miss = state.meta.filter(m => m.miss && !m.cont).length;
+  const both = state.meta.filter(m => !m.miss).length;
+  const warn = both < 0.5 * Math.min(state.A.cues.length, state.B.cues.length)
+    ? ' · ⚠ poucos pares encontrados: confira se os timecodes iniciais são diferentes e use "Deslocar tradução"' : '';
+  $('status').textContent = `${state.rows.length} linhas geradas (${state.A.cues.length} no template, ${state.B.cues.length} na legenda final)` + (miss ? ` · ${miss} sem par` : '') + warn;
+}
+
+function download(){
+  const blob = buildXLSX(state.rows, $('header').checked);
+  const base = (state.nameA || 'legendas').replace(/\.[^.]+$/, '');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = base + '_alinhado.xlsx';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+for (const side of ['A','B']){
+  const input = $('file'+side), drop = $('drop'+side);
+  input.addEventListener('change', () => { if (input.files[0]) loadFile(side, input.files[0]); input.value = ''; });
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) loadFile(side, e.dataTransfer.files[0]); });
+}
+$('fps').addEventListener('change', refresh);
+$('tol').addEventListener('change', refresh);
+$('off').addEventListener('change', refresh);
+$('btn').addEventListener('click', download);
+</script>
+</body>
+</html>
