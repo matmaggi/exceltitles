@@ -3,58 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Template + Legenda → Excel</title>
+<title>ExcelTitles – Template + Legenda → Excel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20fill%3D%22%231f6f5c%22%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%2F%3E%3Crect%20fill%3D%22%23ffffff%22%20x%3D%2214%22%20y%3D%2216%22%20width%3D%2236%22%20height%3D%228%22%20rx%3D%222%22%20opacity%3D%22.55%22%2F%3E%3Crect%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20x%3D%2212%22%20y%3D%2214%22%20width%3D%2240%22%20height%3D%2236%22%20rx%3D%225%22%20stroke-width%3D%223.5%22%2F%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M12%2032H52M12%2041H52M26%2024V50M38%2024V50%22%20stroke-width%3D%223%22%2F%3E%3C%2Fsvg%3E">
 <style>
-  :root{
-    --bg:#f6f5f9; --card:#ffffff; --text:#1f1d2b; --muted:#6b6880; --line:#dcd8e8;
-    --accent:#6a4fc4; --accent-text:#ffffff; --head:#d9d2e9; --warn:#fff4d6; --ok:#e6f4ea;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#17151f; --card:#221f2e; --text:#ece9f6; --muted:#9a96b0; --line:#3a3650;
-      --accent:#9b84ec; --accent-text:#14121c; --head:#3b3358; --warn:#4a3d16; --ok:#1f3a2a;
-    }
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:24px}
-  .wrap{max-width:1000px;margin:0 auto}
-  h1{font-size:22px;margin:0 0 4px}
-  p.sub{margin:0 0 20px;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media (max-width:700px){.grid{grid-template-columns:1fr}}
-  .drop{background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.15s}
-  .drop:hover,.drop.over{border-color:var(--accent)}
-  .drop.loaded{border-style:solid;border-color:var(--accent)}
-  .drop h2{margin:0 0 4px;font-size:16px}
-  .drop .hint{color:var(--muted);font-size:13px}
-  .drop .fname{margin-top:10px;font-weight:600;word-break:break-all}
-  .drop .info{color:var(--muted);font-size:13px}
-  .drop input{display:none}
-  .opts{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:16px;display:flex;flex-wrap:wrap;gap:18px;align-items:center}
-  .opts label{display:flex;align-items:center;gap:8px;font-size:14px}
-  select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
-  input[type=number]{width:70px}
-  input[type=text]{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
-  button{background:var(--accent);color:var(--accent-text);border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
-  button:disabled{opacity:.4;cursor:not-allowed}
-  .actions{margin-top:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-  #status{color:var(--muted);font-size:14px}
-  #error{color:#c0392b;margin-top:12px;font-weight:600}
-  .tablewrap{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:520px}
-  table{border-collapse:collapse;width:100%;font-size:13px}
-  th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:center;vertical-align:middle;white-space:pre-wrap}
-  th{position:sticky;top:0;background:var(--head)}
-  td.tc{font-variant-numeric:tabular-nums;white-space:nowrap;width:110px}
-  tr.miss td.b{background:var(--warn)}
-  tr.miss td.c{background:var(--warn)}
-  tr.cont td{background:var(--ok)}
-  .legend{font-size:12px;color:var(--muted);margin-top:8px}
+:root{--bg:#eef1ef;--card:#ffffff;--tx:#1b2420;--mut:#5f6d66;--bd:#d8dfdb;--ac:#1f6f5c;--acb:#e3f1ec;--onac:#ffffff;--err:#b42318;--t1:#e6f4ee;--t2:#fdf1dc;--t3:#e7edfc;--t4:#fbe9f1;--green:#2f9e78;--amber:#f59f00;--blue:#4c6ef5;--pink:#e64980;--disp:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--sys:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:light;--warn:var(--t2);--ok:var(--t1);--head:var(--t3)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121714;--card:#1b221e;--tx:#e6ece8;--mut:#9aa8a0;--bd:#2d3832;--ac:#5fc4a8;--acb:#1f3a31;--onac:#0e1a15;--err:#ff8b7e;--t1:#18291f;--t2:#2b2515;--t3:#1a2236;--t4:#2b1c25;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121714;--card:#1b221e;--tx:#e6ece8;--mut:#9aa8a0;--bd:#2d3832;--ac:#5fc4a8;--acb:#1f3a31;--onac:#0e1a15;--err:#ff8b7e;--t1:#18291f;--t2:#2b2515;--t3:#1a2236;--t4:#2b1c25;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 var(--sys);min-height:100vh}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 40px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+.drop{background:var(--t1);border:2px dashed var(--green);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--ac);background:var(--acb)}
+.drop.loaded{border-style:solid;border-color:var(--ac)}
+.drop h2{margin:0 0 4px;font:700 1.05rem/1.25 var(--disp)}
+.drop .hint{color:var(--mut);font-size:13px}
+.drop .fname{margin-top:10px;font-weight:600;word-break:break-all}
+.drop .info{color:var(--mut);font-size:13px}
+.drop input{display:none}
+.opts{background:var(--t2);border:1px solid var(--bd);border-top:4px solid var(--amber);border-radius:12px;padding:14px 16px;margin-top:16px;display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+.opts label{display:flex;align-items:center;gap:8px;font-size:14px}
+select,input[type=number],input[type=text]{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:5px 8px;font:inherit}
+input[type=number]{width:70px}
+button{background:var(--ac);color:var(--onac);border:0;border-radius:8px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
+button:hover:not(:disabled){filter:brightness(1.12)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.actions{margin-top:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#status{color:var(--mut);font-size:14px}
+#error{color:var(--err);margin-top:12px;font-weight:600}
+.tablewrap{margin-top:18px;background:var(--card);border:1px solid var(--bd);border-top:4px solid var(--blue);border-radius:12px;overflow:auto;max-height:520px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--bd);padding:6px 10px;text-align:center;vertical-align:middle;white-space:pre-wrap}
+th{position:sticky;top:0;background:var(--head);font-family:var(--disp)}
+td.tc{font-variant-numeric:tabular-nums;white-space:nowrap;width:110px}
+tr.miss td.b{background:var(--warn)}
+tr.miss td.c{background:var(--warn)}
+tr.cont td{background:var(--ok)}
+.legend{font-size:12px;color:var(--mut);margin-top:8px}
+/* ===== identidade da família ===== */
+body{border-top:5px solid;border-image:linear-gradient(90deg,#2f9e78,#f59f00,#4c6ef5,#e64980) 1}
+.fh{text-align:center;padding-top:26px;padding-bottom:18px}
+.fh .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 6px}
+.fh .brand svg{width:clamp(40px,8vw,48px);height:auto;flex:none}
+.fh h1{margin:0;font:800 clamp(1.75rem,4.6vw,2.2rem)/1.05 var(--disp);letter-spacing:-.03em;color:var(--tx)}
+.fh .sub{margin:0 auto;max-width:64ch;color:var(--mut);font-size:1rem;line-height:1.45}
+.fh .note{margin:6px auto 0;max-width:64ch;color:var(--mut);font-size:.85rem;line-height:1.4}
+.logo-bg{fill:var(--ac)}.logo-fg{fill:var(--onac)}
+.logo-st{fill:none;stroke:var(--onac);stroke-linecap:round;stroke-linejoin:round}
+.logo-ck{fill:none;stroke:var(--ac);stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Template + Legenda → Excel</h1>
-  <p class="sub">Carregue a legenda template (inglês) e a legenda final (português). Formatos aceitos: SRT, DFXP, PXTT, TTML, TTAL. Tudo roda no seu navegador, nada é enviado para lugar nenhum.</p>
+  <header class="fh">
+  <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect class="logo-bg" width="64" height="64" rx="16"/><rect class="logo-fg" x="14" y="16" width="36" height="8" rx="2" opacity=".55"/><rect class="logo-st" x="12" y="14" width="40" height="36" rx="5" stroke-width="3.5"/><path class="logo-st" d="M12 32H52M12 41H52M26 24V50M38 24V50" stroke-width="3"/></svg><h1>ExcelTitles</h1></div>
+  <p class="sub">Template + Legenda → Excel</p>
+  <p class="note">Carregue a legenda template (inglês) e a legenda final (português). <br/>Formatos aceitos: SRT, DFXP, PXTT, TTML, TTAL. <br/>Tudo roda no seu navegador, nada é enviado para lugar nenhum.</p>
+</header>
 
   <div class="grid">
     <label class="drop" id="dropA">
