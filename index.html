@@ -33,9 +33,16 @@ button{background:var(--ac);color:var(--onac);border:0;border-radius:8px;padding
 button:hover:not(:disabled){filter:brightness(1.12)}
 button:disabled{opacity:.4;cursor:not-allowed}
 .actions{margin-top:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-#status{color:var(--mut);font-size:14px}
+#status{color:var(--mut);font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12.5px;font-weight:600;background:var(--card);border:1px solid var(--bd);color:var(--tx)}
+.pill.warn{background:var(--warn);border-color:var(--amber)}
+.pill.ok{background:var(--ok);border-color:var(--green)}
+.pill.bad{background:var(--t4);border-color:var(--pink);color:var(--err)}
+.tip{position:relative;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--ac);color:var(--onac);font:700 11px/1 var(--sys);cursor:help;flex:none}
+.tip::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:300px;padding:8px 11px;border-radius:7px;background:var(--tx);color:var(--bg);font:400 12.5px/1.45 var(--sys);text-align:justify;hyphens:none;white-space:pre-line;box-shadow:0 4px 14px rgba(0,0,0,.18);opacity:0;visibility:hidden;transition:opacity .12s;z-index:40;pointer-events:none}
+.tip:hover::after,.tip:focus::after{opacity:1;visibility:visible}
 #error{color:var(--err);margin-top:12px;font-weight:600}
-.tablewrap{margin-top:18px;background:var(--card);border:1px solid var(--bd);border-top:4px solid var(--blue);border-radius:12px;overflow:auto;max-height:520px}
+.tablewrap{margin-top:8px;background:var(--card);border:1px solid var(--bd);border-top:4px solid var(--blue);border-radius:12px;overflow:auto;max-height:520px}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{border-bottom:1px solid var(--bd);padding:6px 10px;text-align:center;vertical-align:middle;white-space:pre-wrap}
 th{position:sticky;top:0;background:var(--head);font-family:var(--disp)}
@@ -43,7 +50,7 @@ td.tc{font-variant-numeric:tabular-nums;white-space:nowrap;width:110px}
 tr.miss td.b{background:var(--warn)}
 tr.miss td.c{background:var(--warn)}
 tr.cont td{background:var(--ok)}
-.legend{font-size:12px;color:var(--mut);margin-top:8px}
+.legend{font-size:12px;color:var(--mut);margin-top:12px}
 /* ===== identidade da família ===== */
 body{border-top:5px solid;border-image:linear-gradient(90deg,#2f9e78,#f59f00,#4c6ef5,#e64980) 1}
 .fh{text-align:center;padding-top:26px;padding-bottom:18px}
@@ -61,12 +68,26 @@ body{border-top:5px solid;border-image:linear-gradient(90deg,#2f9e78,#f59f00,#4c
 footer.ft{text-align:center;color:var(--mut);font-size:.9rem;line-height:1.5;padding:28px 20px 32px;max-width:none}
 footer.ft p{margin:0}footer.ft p+p{margin-top:6px}
 footer.ft a{color:var(--ac);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+/* ===== balão de ajuda (README) ===== */
+.fh .brand{position:relative}
+.ajuda{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ac);color:var(--onac);font:700 15px/1 var(--sys);cursor:help;flex:none;align-self:center;user-select:none}
+.ajuda-box{position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:100;width:800px;max-width:calc(100vw - 32px);max-height:75vh;overflow:auto;margin-top:8px;padding:18px 24px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-top:4px solid var(--ac);border-radius:12px;box-shadow:0 14px 36px rgba(0,0,0,.25);font:400 14px/1.55 var(--sys);text-align:justify;hyphens:none;-webkit-hyphens:none;word-break:normal;overflow-wrap:normal;cursor:auto;visibility:hidden;opacity:0;transition:opacity .12s ease .3s,visibility 0s linear .42s!important}
+.ajuda:hover .ajuda-box,.ajuda:focus .ajuda-box,.ajuda:focus-within .ajuda-box,.ajuda-box:hover{visibility:visible;opacity:1;transition:opacity .12s ease 0s,visibility 0s linear 0s!important}
+.ajuda-box h2{font:800 1.3rem/1.2 var(--disp);margin:0 0 6px;text-align:left}
+.ajuda-box h3{font:700 1.05rem/1.25 var(--disp);margin:16px 0 4px;text-align:left}
+.ajuda-box h4{font:700 .95rem/1.3 var(--sys);margin:12px 0 2px;text-align:left}
+.ajuda-box p{margin:6px 0}
+.ajuda-box ul{margin:4px 0;padding-left:22px}
+.ajuda-box li{margin:3px 0}
+/* ===== PIX ===== */
+.pix{user-select:all;-webkit-user-select:all;cursor:pointer;color:var(--tx);overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="fh">
-  <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect class="logo-bg" width="64" height="64" rx="16"/><rect class="logo-fg" x="14" y="16" width="36" height="8" rx="2" opacity=".55"/><rect class="logo-st" x="12" y="14" width="40" height="36" rx="5" stroke-width="3.5"/><path class="logo-st" d="M12 32H52M12 41H52M26 24V50M38 24V50" stroke-width="3"/></svg><h1>ExcelTitles</h1></div>
+  <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect class="logo-bg" width="64" height="64" rx="16"/><rect class="logo-fg" x="14" y="16" width="36" height="8" rx="2" opacity=".55"/><rect class="logo-st" x="12" y="14" width="40" height="36" rx="5" stroke-width="3.5"/><path class="logo-st" d="M12 32H52M12 41H52M26 24V50M38 24V50" stroke-width="3"/></svg><h1>ExcelTitles</h1><span class="ajuda" tabindex="0" role="button" aria-label="Sobre o ExcelTitles">?<div class="ajuda-box" role="tooltip"><h2>ExcelTitles</h2><p><b>Template + Legenda → Excel: alinhe o original em inglês e a tradução em uma planilha, legenda por legenda.</b></p><p>O ExcelTitles junta a legenda template (inglês) e a legenda final (português) em um arquivo .xlsx com três colunas: tempo inicial, template e tradução. É útil para entregas que pedem planilha, revisões, relatórios e glossários.</p><h3>Formatos aceitos</h3><p>SRT, DFXP, PXTT, TTML e TTAL (os dois arquivos podem estar em formatos diferentes).</p><h3>Funcionalidades</h3><ul><li><b>Pareamento automático</b> pela sobreposição de tempo, mesmo quando as legendas foram divididas ou mescladas de forma diferente nos dois arquivos. Cada legenda se liga só à do outro lado com a maior sobreposição, e as linhas seguem o tempo, então uma legenda longa não desalinha a cena inteira.</li><li><b>Linhas de continuação:</b> quando um lado tem mais divisões que o outro, as linhas extras ficam alinhadas, com o outro lado em branco.</li><li><b>Prévia na tela</b> antes de baixar:<ul><li>amarelo: texto só de um lado;</li><li>verde: linha de continuação.</li></ul></li><li><b>Timecode em frames</b> (HH:MM:SS:FF), com frame rate de 23,976 a 60. Se o template já estiver em timecode SMPTE, o frame rate é selecionado sozinho. Linhas que só existem na tradução também recebem o tempo inicial (o da tradução).</li><li><b>Explicações</b> (“?”) no frame rate, na tolerância e no deslocamento.</li><li><b>Tolerância de pareamento</b> (em segundos) para legendas sem sobreposição de tempo.</li><li><b>Deslocamento automático:</b> quando os arquivos começam em relógios diferentes (ex.: 01:00:00:00 em um e 00:00:00:00 no outro), o deslocamento é detectado e aplicado sozinho. Dá para alterar à mão, inclusive com valores negativos.</li><li><b>Resumo em etiquetas:</b> linhas geradas, legendas em cada arquivo, pareadas, continuações, sem par, deslocamento aplicado e aviso de poucos pares.</li><li><b>Itálico preservado</b> como <code>&lt;i&gt;</code> e quebras de linha mantidas dentro da célula.</li><li><b>Cabeçalho opcional</b> (Tempo Inicial / Template / Tradução), com a primeira linha congelada.</li><li>Detecta UTF-8, UTF-16 e Windows-1252.</li><li>Lê legendas SRT com linha em branco no meio do texto, timecode drop-frame em 29,97 e 59,94, e itálico de DFXP/TTML definido em estilos encadeados ou na região.</li><li>O arquivo é salvo como <code>&lt;nome do template&gt;_alinhado.xlsx</code>.</li></ul><h3>Privacidade</h3><p>Tudo roda no seu navegador. Nada é enviado para lugar nenhum, e a planilha é gerada sem bibliotecas externas.</p></div></span></div>
   <p class="sub">Template + Legenda → Excel</p>
   <p class="note">Carregue a legenda template (inglês) e a legenda final (português). <br/>Formatos aceitos: SRT, DFXP, PXTT, TTML, TTAL. <br/>Tudo roda no seu navegador, nada é enviado para lugar nenhum.</p>
 </header>
@@ -89,7 +110,7 @@ footer.ft a{color:var(--ac);font-weight:600;text-decoration:underline;text-under
   </div>
 
   <div class="opts">
-    <label>Frame rate do timecode
+    <label>Frame rate do timecode <span class="tip" tabindex="0" data-tip="Usado para escrever o Tempo Inicial em HH:MM:SS:FF quando o arquivo tem tempos em milissegundos (como SRT) e para converter o deslocamento em frames.&#10;&#10;Se o template já vier em timecode (DFXP, PXTT ou TTAL em frames), o frame rate dele é escolhido sozinho.">?</span>
       <select id="fps">
         <option value="23.976" selected>23.976</option>
         <option value="24">24</option>
@@ -101,10 +122,10 @@ footer.ft a{color:var(--ac);font-weight:600;text-decoration:underline;text-under
         <option value="60">60</option>
       </select>
     </label>
-    <label>Tolerância de pareamento
+    <label>Tolerância de pareamento <span class="tip" tabindex="0" data-tip="Só vale para legendas que não se sobrepõem no tempo a nenhuma do outro arquivo: elas são pareadas com a legenda cujo início estiver mais perto, até esta distância (em segundos).&#10;&#10;Use 0 para parear só o que se sobrepõe.">?</span>
       <input type="number" id="tol" value="1" min="0" max="10" step="0.1"> s
     </label>
-    <label>Deslocar tradução
+    <label>Deslocar tradução <span class="tip" tabindex="0" data-tip="Quando os timecodes iniciais são diferentes (ex.: 01:00:00:00 num arquivo e 00:00:00:00 no outro), o deslocamento é detectado e aplicado sozinho. Você pode alterar o valor; aceita sinal negativo (ex.: -01:00:00:00).">?</span>
       <input type="text" id="off" value="00:00:00:00" style="width:105px" title="Use quando os timecodes iniciais forem diferentes (ex.: 01:00:00:00 em um e 00:00:00:00 no outro). Aceita sinal negativo, ex.: -01:00:00:00">
     </label>
     <label><input type="checkbox" id="header" checked> Incluir cabeçalho (Tempo Inicial / Template / Tradução)</label>
@@ -116,16 +137,16 @@ footer.ft a{color:var(--ac);font-weight:600;text-decoration:underline;text-under
   </div>
   <div id="error"></div>
 
+  <div class="legend" id="legend" hidden>Linhas amarelas: só existe texto de um dos lados. Linhas verdes: continuação (um lado tem mais divisões que o outro, então o outro fica em branco para manter o alinhamento).</div>
   <div class="tablewrap" id="tablewrap" hidden>
     <table>
       <thead><tr><th>Tempo Inicial</th><th>Template</th><th>Tradução</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
-  <div class="legend" id="legend" hidden>Linhas amarelas: só existe texto de um dos lados. Linhas verdes: continuação (um lado tem mais divisões que o outro, então o outro fica em branco para manter o alinhamento).</div>
 </div>
 
-<footer class="ft"><p>Veja mais ferramentas úteis para legendagem clicando <a href="https://matmaggi.github.io/subtools/">aqui</a>.</p></footer>
+<footer class="ft"><p>Veja mais ferramentas úteis para legendagem clicando <a href="https://matmaggi.github.io/subtools/">aqui</a>.</p><p>Achou a ferramenta útil? Faz um PIX! <b class="pix" title="Clique para selecionar a chave PIX">5a08fa27-b8f4-4935-9857-6b03fb63248a</b></p></footer>
 <script>
 /* ============================================================
    PARSERS
@@ -154,22 +175,29 @@ function cleanInline(s){
 }
 
 /* ---------- SRT ---------- */
+/* cada legenda vai de uma linha de tempo até a próxima: linhas em branco (mesmo com espaços) no meio do texto
+   não cortam a legenda, e um número sozinho só é numeração se vier logo antes da linha de tempo */
 function parseSRT(text){
-  const cues = [];
-  const blocks = text.replace(/\r\n?/g, '\n').split(/\n{2,}/);
+  const cues = [], L = text.replace(/\r\n?/g, '\n').split('\n');
   const tre = /(\d+):(\d\d):(\d\d)[,.](\d{1,3})\s*-->\s*(\d+):(\d\d):(\d\d)[,.](\d{1,3})/;
-  for (const blk of blocks){
-    const lines = blk.split('\n');
-    const i = lines.findIndex(l => tre.test(l));
-    if (i < 0) continue;
-    const m = lines[i].match(tre);
-    const ms = (h,mi,s,f) => (+h)*3600 + (+mi)*60 + (+s) + (+(f.padEnd(3,'0')))/1000;
-    const start = ms(m[1],m[2],m[3],m[4]);
-    const end   = ms(m[5],m[6],m[7],m[8]);
-    const body = lines.slice(i+1).map(l => cleanInline(l).trim()).filter(l => l.length);
-    if (!body.length) continue;
-    cues.push({start, end, lines: body, tc: null});
+  const ms = (h,mi,s,f) => (+h)*3600 + (+mi)*60 + (+s) + (+(f.padEnd(3,'0')))/1000;
+  let cur = null;
+  const close = () => {
+    if (!cur) return;
+    let j = cur.tx.length - 1; while (j >= 0 && !cur.tx[j].trim()) j--;
+    if (cur.numNext && j >= 0 && /^\s*\d+\s*$/.test(cur.tx[j]) && (j === 0 || !cur.tx[j-1].trim())) cur.tx.length = j;   // numeração da próxima
+    const body = cur.tx.map(l => cleanInline(l).trim()).filter(l => l.length);
+    if (body.length) cues.push({start: cur.start, end: cur.end, lines: body, tc: null});
+    cur = null;
+  };
+  for (const line of L){
+    const m = line.match(tre);
+    if (!m){ if (cur) cur.tx.push(line); continue; }
+    if (cur) cur.numNext = true;
+    close();
+    cur = {start: ms(m[1],m[2],m[3],m[4]), end: ms(m[5],m[6],m[7],m[8]), tx: []};
   }
+  close();
   return {cues, fps: null, kind: 'SRT'};
 }
 
@@ -188,40 +216,52 @@ function parseXMLSubs(text){
   const mult = (attr(root,'frameRateMultiplier') || '1 1').trim().split(/\s+/).map(Number);
   const multiplier = (mult[0] && mult[1]) ? mult[0]/mult[1] : 1;
   const effFps = frameRate * multiplier;
-  const dropNTSC = (attr(root,'dropMode') || '') === 'dropNTSC' && frameRate === 30;
+  const nomFr = Math.round(frameRate);
+  const dropDoc = (attr(root,'dropMode') || '') === 'dropNTSC';
+  const canDrop = nomFr === 30 || nomFr === 60;   // drop-frame: 29,97 pula 2 quadros por minuto, 59,94 pula 4 (exceto a cada 10 min)
   const tickRate = parseFloat(attr(root,'tickRate')) || (frameRate*multiplier) || 1;
   const timeBase = attr(root,'timeBase') || 'media';
 
-  // estilos itálicos
-  const italicStyles = new Set();
-  for (const st of doc.getElementsByTagName('*')){
-    if (st.localName === 'style' && (attr(st,'fontStyle') === 'italic' || attr(st,'fontStyle') === 'oblique')){
-      const id = st.getAttribute('xml:id') || attr(st,'id');
-      if (id) italicStyles.add(id);
-    }
+  // estilos: diretos, encadeados (um estilo que usa outro) e da região
+  const styleEl = {}, regionEl = {};
+  for (const el of doc.getElementsByTagName('*')){
+    const id = el.getAttribute('xml:id') || attr(el,'id'); if (!id) continue;
+    if (el.localName === 'style') styleEl[id] = el; else if (el.localName === 'region') regionEl[id] = el;
   }
-  const isItalic = el => {
-    const fs = attr(el,'fontStyle');
-    if (fs) return fs === 'italic' || fs === 'oblique';
-    const sref = attr(el,'style');
-    return !!(sref && sref.split(/\s+/).some(s => italicStyles.has(s)));
+  const own = el => { const fs = attr(el,'fontStyle'); return fs ? (fs === 'italic' || fs === 'oblique') : null; };   // null = não define
+  const styItal = (id, seen = new Set()) => {
+    const st = styleEl[id]; if (!st || seen.has(id)) return null; seen.add(id);
+    const o = own(st); if (o != null) return o;
+    let res = null; for (const ref of (attr(st,'style') || '').split(/\s+/).filter(Boolean)){ const v = styItal(ref, seen); if (v != null) res = v; }
+    return res;
+  };
+  const elItal = el => {
+    const o = own(el); if (o != null) return o;
+    let res = null; for (const ref of (attr(el,'style') || '').split(/\s+/).filter(Boolean)){ const v = styItal(ref); if (v != null) res = v; }
+    return res;
+  };
+  const baseItal = p => {   // herda da região e dos elementos acima do <p> (body, div)
+    const chain = []; for (let el = p.parentNode; el && el.nodeType === 1 && el !== root; el = el.parentNode) chain.unshift(el);
+    let it = false;
+    const rid = [p, ...chain].map(e => attr(e,'region')).find(Boolean);
+    if (rid && regionEl[rid]){ const v = elItal(regionEl[rid]); if (v != null) it = v; }
+    for (const el of chain){ const v = elItal(el); if (v != null) it = v; }
+    const v = elItal(p); return v != null ? v : it;
   };
 
   function parseTime(str){
     if (!str) return null;
     str = str.trim();
     let m;
-    if ((m = str.match(/^(\d+):(\d\d):(\d\d)[:;](\d+)$/))){
-      const h=+m[1], mi=+m[2], s=+m[3], f=+m[4];
-      let total;
-      if (dropNTSC){
-        const tm = h*60 + mi;
-        total = (h*3600 + mi*60 + s)*30 + f - 2*(tm - Math.floor(tm/10));
-      } else {
-        total = (h*3600 + mi*60 + s)*Math.round(frameRate) + f;
+    if ((m = str.match(/^(\d+):(\d\d):(\d\d)([:;])(\d+)$/))){
+      const h=+m[1], mi=+m[2], s=+m[3], f=+m[5];
+      let total = (h*3600 + mi*60 + s)*nomFr + f;
+      if ((dropDoc || m[4] === ';') && canDrop){
+        const tm = h*60 + mi, dpm = nomFr === 30 ? 2 : 4;
+        total -= dpm*(tm - Math.floor(tm/10));
       }
       const sec = total / effFps;
-      const tc = [m[1].padStart(2,'0'), m[2], m[3], m[4].padStart(2,'0')].join(':');
+      const tc = [m[1].padStart(2,'0'), m[2], m[3], m[5].padStart(2,'0')].join(':');
       return {sec, tc};
     }
     if ((m = str.match(/^(\d+):(\d\d):(\d\d(?:[.,]\d+)?)$/))){
@@ -243,7 +283,7 @@ function parseXMLSubs(text){
       } else if (ch.nodeType === 1){
         if (ch.localName === 'br') out.push({t:'br'});
         else if (ch.localName === 'metadata') continue;   // PXTT: metadados dentro do <p>
-        else tokens(ch, italic || isItalic(ch), out);
+        else { const v = elItal(ch); tokens(ch, v != null ? v : italic, out); }
       }
     }
   }
@@ -257,7 +297,7 @@ function parseXMLSubs(text){
     const dur = parseTime(attr(p,'dur'));
     let endSec = e ? e.sec : (dur ? b.sec + dur.sec : b.sec + 2);
     const toks = [];
-    tokens(p, isItalic(p), toks);
+    tokens(p, baseItal(p), toks);
     // quebra em linhas
     const lines = [[]];
     for (const tk of toks){ if (tk.t === 'br') lines.push([]); else lines[lines.length-1].push(tk); }
@@ -362,7 +402,9 @@ function align(A, B, tol){
   const union = (x,y) => { x = find(x); y = find(y); if (x !== y) parent[x] = y; };
   const linkedA = new Array(n).fill(false), linkedB = new Array(m).fill(false);
 
-  // Passo 1: pareamento por sobreposição de tempo
+  // Passo 1: pareamento por sobreposição de tempo. Cada legenda só se liga à legenda do outro lado com a
+  // maior sobreposição (e vice-versa), para uma legenda longa não juntar a cena inteira num grupo só.
+  const bestA = new Array(n).fill(-1), bestB = new Array(m).fill(-1), ovA = new Array(n).fill(0), ovB = new Array(m).fill(0);
   let j0 = 0;
   for (let i = 0; i < n; i++){
     const a = A[i];
@@ -373,11 +415,13 @@ function align(A, B, tol){
       const ov = Math.min(a.end, b.end) - Math.max(a.start, b.start);
       if (ov <= 0) continue;
       const minDur = Math.max(0.001, Math.min(a.end - a.start, b.end - b.start));
-      if (ov >= Math.max(0.05, 0.3 * minDur)){
-        union(i, n + j); linkedA[i] = linkedB[j] = true;
-      }
+      if (ov < Math.max(0.05, 0.3 * minDur)) continue;
+      if (ov > ovA[i]){ ovA[i] = ov; bestA[i] = j; }
+      if (ov > ovB[j]){ ovB[j] = ov; bestB[j] = i; }
     }
   }
+  for (let i = 0; i < n; i++) if (bestA[i] >= 0){ union(i, n + bestA[i]); linkedA[i] = linkedB[bestA[i]] = true; }
+  for (let j = 0; j < m; j++) if (bestB[j] >= 0){ union(bestB[j], n + j); linkedA[bestB[j]] = linkedB[j] = true; }
 
   // Passo 2: cues soltos, pareia pelo início mais próximo dentro da tolerância
   const freeA = [], freeB = [];
@@ -412,16 +456,19 @@ function align(A, B, tol){
     return g;
   }).sort((x,y) => x.t - y.t);
 
+  // Dentro de cada grupo, as linhas seguem o tempo: legendas que se sobrepõem ficam na mesma linha;
+  // o que sobra de um lado vira linha de continuação, com o outro lado em branco.
   const rows = [];
   for (const g of list){
-    const k = Math.max(g.A.length, g.B.length);
-    for (let r = 0; r < k; r++){
-      rows.push({
-        a: r < g.A.length ? A[g.A[r]] : null,
-        b: r < g.B.length ? B[g.B[r]] : null,
-        cont: r > 0
-      });
+    if (g.A.length <= 1 && g.B.length <= 1){ rows.push({a: g.A.length ? A[g.A[0]] : null, b: g.B.length ? B[g.B[0]] : null, cont: false}); continue; }
+    const gr = []; let ia = 0, ib = 0;
+    while (ia < g.A.length || ib < g.B.length){
+      const ca = ia < g.A.length ? A[g.A[ia]] : null, cb = ib < g.B.length ? B[g.B[ib]] : null;
+      if (ca && cb && Math.min(ca.end, cb.end) - Math.max(ca.start, cb.start) > 0){ gr.push({a: ca, b: cb}); ia++; ib++; }
+      else if (ca && (!cb || ca.start <= cb.start)){ gr.push({a: ca, b: null}); ia++; }
+      else { gr.push({a: null, b: cb}); ib++; }
     }
+    gr.forEach(x => rows.push({...x, cont: !(x.a && x.b)}));
   }
   return rows;
 }
@@ -541,6 +588,7 @@ async function loadFile(side, file){
     $('name'+side).textContent = file.name;
     $('info'+side).textContent = describe(res);
     $('drop'+side).classList.add('loaded');
+    autoOff.manual = false; autoOff.key = '';
   } catch (e){
     state[side] = null;
     $('name'+side).textContent = file.name;
@@ -558,15 +606,16 @@ function refresh(){
 
   const fps = parseFloat($('fps').value);
   const tol = parseFloat($('tol').value) || 0;
+  autoOffset(fps);
   const om = $('off').value.trim().match(/^(-?)(\d+):(\d\d):(\d\d)[:;](\d+)$/);
-  const nominal = Math.round(fps);
   const offSec = om ? (om[1] ? -1 : 1) * (((+om[2])*3600 + (+om[3])*60 + (+om[4])) + (+om[5])/fps) : 0;
   const Bcues = offSec ? state.B.cues.map(c => ({...c, start: c.start + offSec, end: c.end + offSec})) : state.B.cues;
   const pairs = align(state.A.cues, Bcues, tol);
 
   state.rows = []; state.meta = [];
   for (const p of pairs){
-    const tc = p.a ? (p.a.tc || secToTC(p.a.start, fps)) : '';
+    // linha só da tradução: usa o tempo dela (já no relógio do template, se houver deslocamento)
+    const tc = p.a ? (p.a.tc || secToTC(p.a.start, fps)) : p.b ? ((!offSec && p.b.tc) || secToTC(p.b.start, fps)) : '';
     state.rows.push([tc, p.a ? p.a.lines.join('\n') : '', p.b ? p.b.lines.join('\n') : '']);
     state.meta.push({miss: !p.a || !p.b, cont: p.cont});
   }
@@ -587,12 +636,46 @@ function refresh(){
   });
   $('tablewrap').hidden = false; $('legend').hidden = false;
   const miss = state.meta.filter(m => m.miss && !m.cont).length;
+  const cont = state.meta.filter(m => m.cont).length;
   const both = state.meta.filter(m => !m.miss).length;
-  const warn = both < 0.5 * Math.min(state.A.cues.length, state.B.cues.length)
-    ? ' · ⚠ poucos pares encontrados: confira se os timecodes iniciais são diferentes e use "Deslocar tradução"' : '';
-  $('status').textContent = `${state.rows.length} linhas geradas (${state.A.cues.length} no template, ${state.B.cues.length} na legenda final)` + (miss ? ` · ${miss} sem par` : '') + warn;
+  const fewPairs = both < 0.5 * Math.min(state.A.cues.length, state.B.cues.length);
+  const pill = (t, c) => `<span class="pill${c ? ' ' + c : ''}">${t}</span>`;
+  $('status').innerHTML = pill(`${state.rows.length} linhas`) + pill(`${state.A.cues.length} no template`) + pill(`${state.B.cues.length} na legenda final`) +
+    pill(`${both} pareadas`, 'ok') + (cont ? pill(`${cont} continuação`, 'ok') : '') + (miss ? pill(`${miss} sem par`, 'warn') : '') +
+    (offSec ? pill(`deslocamento ${$('off').value.trim()}${autoOff.applied === $('off').value.trim() ? ' (detectado)' : ''}`) : '') +
+    (fewPairs ? pill('⚠ poucos pares: confira o deslocamento', 'bad') : '');
 }
 
+/* ---------- deslocamento automático ---------- */
+// Se os dois arquivos começam em relógios diferentes (ex.: 01:00:00:00 e 00:00:00:00), acha o deslocamento que
+// faz mais legendas se sobreporem e aplica sozinho, enquanto o campo não tiver sido alterado à mão.
+const autoOff = {manual: false, applied: '', key: ''};
+function overlapScore(A, B, d){
+  let j = 0, c = 0;
+  for (const a of A){
+    while (j < B.length && B[j].end + d <= a.start) j++;
+    for (let k = j; k < B.length && B[k].start + d < a.end; k++){ if (Math.min(a.end, B[k].end + d) - Math.max(a.start, B[k].start + d) > 0){ c++; break; } }
+  }
+  return c;
+}
+function offTC(d, fps){
+  // mesmo formato que o campo entende: segundos reais + quadros
+  const sg = d < 0 ? '-' : '', ad = Math.abs(d), n = Math.round(fps), pad = x => String(x).padStart(2,'0');
+  let s = Math.floor(ad + 1e-6), f = Math.round((ad - s) * fps); if (f >= n){ s++; f = 0; }
+  return `${sg}${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}:${pad(f)}`;
+}
+function autoOffset(fps){
+  if (autoOff.manual) return;
+  const A = state.A.cues, B = state.B.cues, key = A.length + '|' + B.length + '|' + (A[0] && A[0].start) + '|' + (B[0] && B[0].start) + '|' + fps;
+  if (key === autoOff.key) return; autoOff.key = key;
+  const d0 = A[0].start - B[0].start, cands = new Set([0, d0, Math.round(d0/3600)*3600, Math.round(d0/60)*60, Math.round(d0)]);
+  const diffs = []; for (let k = 0; k < Math.min(15, A.length, B.length); k++) diffs.push(A[k].start - B[k].start);
+  diffs.sort((x, y) => x - y); if (diffs.length) cands.add(diffs[diffs.length >> 1]);
+  let best = 0, bs = overlapScore(A, B, 0);
+  for (const d of cands){ const sc = overlapScore(A, B, d); if (sc > bs * 1.3 && sc > bs + 2){ bs = sc; best = d; } }
+  const v = best ? offTC(best, fps) : '00:00:00:00';
+  $('off').value = v; autoOff.applied = best ? v : '';
+}
 function download(){
   const blob = buildXLSX(state.rows, $('header').checked);
   const base = (state.nameA || 'legendas').replace(/\.[^.]+$/, '');
@@ -612,7 +695,7 @@ for (const side of ['A','B']){
 }
 $('fps').addEventListener('change', refresh);
 $('tol').addEventListener('change', refresh);
-$('off').addEventListener('change', refresh);
+$('off').addEventListener('change', () => { autoOff.manual = $('off').value.trim() !== autoOff.applied; refresh(); });
 $('btn').addEventListener('click', download);
 </script>
 </body>
